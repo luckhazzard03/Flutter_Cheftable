@@ -20,6 +20,7 @@ dev_dependencies:
   crypto: ^3.0.1
   flutter_secure_storage: ^6.1.0
   #crypto: ^3.0.1 encripta la contraseña
+  shared_preferences: ^2.0.15 # Asegúrate de usar la última versión disponible
 
 flutter:
   uses-material-design: true

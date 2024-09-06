@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'calculator_page.dart';
+import 'user_management_page.dart'; // Asegúrate de que esta página exista y esté correctamente importada
 import '../services/auth_service.dart'; // Ajusta el import según tu estructura
 
 class LoginPage extends StatefulWidget {
@@ -27,9 +27,11 @@ class _LoginPageState extends State<LoginPage> {
             content: Text('Ingreso exitoso'),
           ),
         );
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const MyApp()),
+          MaterialPageRoute(
+              builder: (context) =>
+                  const UserManagementPage()), // Cambia a la página deseada
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

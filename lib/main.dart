@@ -17,9 +17,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Login Cheftable',
-      home: LoginPage(),
+      title: 'Cheftable',
+      home: UserManagementPage(), // Cambia esta línea para la página que desees como inicio
     );
   }
 }
-
