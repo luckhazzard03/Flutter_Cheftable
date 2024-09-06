@@ -1,0 +1,30 @@
+name: flutter_application_5
+description: "A new Flutter project."
+
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.4.4 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.6
+  http: any
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  crypto: ^3.0.1
+  flutter_secure_storage: ^6.1.0
+  #crypto: ^3.0.1 encripta la contraseña
+
+flutter:
+  uses-material-design: true
+
+  # Aquí agregamos la sección de assets
+  assets:
+    - assets/img/logo.png
+    - assets/img/rest.jpg
