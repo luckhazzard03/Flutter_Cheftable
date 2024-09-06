@@ -110,8 +110,9 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: _login,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(
-                    255, 18, 32, 63), // Color de fondo del botón
-                foregroundColor: Colors.white, // Color del texto del botón
+                    206, 179, 255, 0), // Color de fondo del botón
+                foregroundColor: const Color.fromARGB(
+                    255, 34, 57, 87), // Color del texto del botón
                 shape: RoundedRectangleBorder(
                   borderRadius:
                       BorderRadius.circular(30.0), // Bordes redondeados

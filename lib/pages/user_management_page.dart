@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/user.dart'; // Ajusta la ruta según tu estructura
+import 'login_page.dart'; // Importa la página de inicio de sesión
 
 class UserManagementPage extends StatefulWidget {
   const UserManagementPage({super.key});
@@ -47,6 +48,15 @@ class _UserManagementPageState extends State<UserManagementPage> {
     });
   }
 
+  void _logout() {
+    // Aquí deberías agregar la lógica para cerrar sesión, por ejemplo, eliminando un token de autenticación.
+    // Luego redirige al usuario a la página de inicio de sesión.
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,6 +67,16 @@ class _UserManagementPageState extends State<UserManagementPage> {
           color: Colors.white, // Cambia el color del título aquí
           fontSize: 20, // Puedes ajustar el tamaño de la fuente si lo deseas
         ),
+        actions: [
+          TextButton(
+            onPressed: _logout,
+            child: const Text(
+              'Cerrar sesión',
+              style:
+                  TextStyle(color: Colors.white), // Color del texto del botón
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
