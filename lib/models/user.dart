@@ -1,8 +1,15 @@
+// models/user.dart
 
-// lib/models/user.dart
 class User {
-  String name;
-  String email;
+  final String name;
+  final String email;
+  final String phone;
+  final String role;
 
-  User({required this.name, required this.email});
+  User({
+    required this.name,
+    required this.email,
+    required this.phone,
+    required this.role,
+  });
 }

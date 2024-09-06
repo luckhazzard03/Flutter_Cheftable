@@ -13,30 +13,40 @@ class _UserManagementPageState extends State<UserManagementPage> {
   final List<User> _users = [];
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  String? _selectedRole;
+  final List<String> _roles = ['Admin', 'Cheft', 'Mesero']; // Lista de roles
   User? _editingUser;
 
   void _addUser() {
     final name = _nameController.text;
     final email = _emailController.text;
+    final phone = _phoneController.text;
+    final role = _selectedRole ?? '';
 
-    if (name.isEmpty || email.isEmpty) return;
+    if (name.isEmpty || email.isEmpty || phone.isEmpty || role.isEmpty) return;
 
     setState(() {
       if (_editingUser != null) {
         final index = _users.indexOf(_editingUser!);
-        _users[index] = User(name: name, email: email);
+        _users[index] =
+            User(name: name, email: email, phone: phone, role: role);
         _editingUser = null;
       } else {
-        _users.add(User(name: name, email: email));
+        _users.add(User(name: name, email: email, phone: phone, role: role));
       }
       _nameController.clear();
       _emailController.clear();
+      _phoneController.clear();
+      _selectedRole = null;
     });
   }
 
   void _editUser(User user) {
     _nameController.text = user.name;
     _emailController.text = user.email;
+    _phoneController.text = user.phone;
+    _selectedRole = user.role;
     setState(() {
       _editingUser = user;
     });
@@ -91,6 +101,27 @@ class _UserManagementPageState extends State<UserManagementPage> {
               decoration:
                   const InputDecoration(labelText: 'Correo electrónico'),
             ),
+            TextField(
+              controller: _phoneController,
+              decoration: const InputDecoration(labelText: 'Teléfono'),
+            ),
+            DropdownButtonFormField<String>(
+              value: _selectedRole,
+              items: _roles.map((String role) {
+                return DropdownMenuItem<String>(
+                  value: role,
+                  child: Text(role),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedRole = newValue;
+                });
+              },
+              decoration: const InputDecoration(
+                labelText: 'Rol',
+              ),
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _addUser,
@@ -117,7 +148,8 @@ class _UserManagementPageState extends State<UserManagementPage> {
                   final user = _users[index];
                   return ListTile(
                     title: Text(user.name),
-                    subtitle: Text(user.email),
+                    subtitle:
+                        Text('${user.email} - ${user.phone} - ${user.role}'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
