@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/user.dart'; // Ajusta la ruta según tu estructura
 import 'login_page.dart'; // Importa la página de inicio de sesión
+import 'order.dart'; // Asegúrate de importar la página de gestión de comandas
 
 class UserManagementPage extends StatefulWidget {
   const UserManagementPage({super.key});
@@ -15,7 +16,6 @@ class _UserManagementPageState extends State<UserManagementPage> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   String? _selectedRole;
-  final List<String> _roles = ['Admin', 'Cheft', 'Mesero']; // Lista de roles
   User? _editingUser;
 
   void _addUser() {
@@ -67,6 +67,13 @@ class _UserManagementPageState extends State<UserManagementPage> {
     );
   }
 
+  void _navigateToOrderManagement() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const OrderManagementPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,19 +81,54 @@ class _UserManagementPageState extends State<UserManagementPage> {
         title: const Text('Gestión de Usuarios'),
         backgroundColor: const Color.fromARGB(255, 20, 42, 59),
         titleTextStyle: const TextStyle(
-          color: Colors.white, // Cambia el color del título aquí
-          fontSize: 20, // Puedes ajustar el tamaño de la fuente si lo deseas
+          color: Colors.white,
+          fontSize: 20,
         ),
         actions: [
-          TextButton(
+          IconButton(
+            icon: const Icon(Icons.logout),
             onPressed: _logout,
-            child: const Text(
-              'Cerrar sesión',
-              style:
-                  TextStyle(color: Colors.white), // Color del texto del botón
-            ),
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: Container(
+          color: const Color.fromARGB(
+              255, 82, 100, 48), // Color verde para todo el Drawer
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(
+                      255, 20, 42, 59), // Color más oscuro para el encabezado
+                ),
+                child: Text(
+                  'Menú',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                  ),
+                ),
+              ),
+              ListTile(
+                title: Text('Gestión de Usuarios',
+                    style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context); // Cierra el menú
+                },
+              ),
+              ListTile(
+                title: Text('Gestión de Comandas',
+                    style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context); // Cierra el menú
+                  _navigateToOrderManagement();
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -105,33 +147,30 @@ class _UserManagementPageState extends State<UserManagementPage> {
               controller: _phoneController,
               decoration: const InputDecoration(labelText: 'Teléfono'),
             ),
-            DropdownButtonFormField<String>(
+            DropdownButton<String>(
               value: _selectedRole,
-              items: _roles.map((String role) {
-                return DropdownMenuItem<String>(
-                  value: role,
-                  child: Text(role),
-                );
-              }).toList(),
+              hint: const Text('Selecciona un rol'),
               onChanged: (String? newValue) {
                 setState(() {
                   _selectedRole = newValue;
                 });
               },
-              decoration: const InputDecoration(
-                labelText: 'Rol',
-              ),
+              items: <String>['Admin', 'Chef', 'Mesero']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _addUser,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(
-                    214, 99, 219, 0), // Color de fondo del botón
-                foregroundColor: Colors.white, // Color del texto del botón
+                backgroundColor: const Color.fromARGB(214, 99, 219, 0),
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                      30.0), // Bordes redondeados del botón
+                  borderRadius: BorderRadius.circular(30.0),
                 ),
                 padding: const EdgeInsets.symmetric(
                     horizontal: 40.0, vertical: 12.0),
@@ -148,8 +187,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
                   final user = _users[index];
                   return ListTile(
                     title: Text(user.name),
-                    subtitle:
-                        Text('${user.email} - ${user.phone} - ${user.role}'),
+                    subtitle: Text('${user.email} - ${user.role}'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
