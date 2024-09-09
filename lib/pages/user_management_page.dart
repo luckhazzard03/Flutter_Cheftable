@@ -84,6 +84,10 @@ class _UserManagementPageState extends State<UserManagementPage> {
           color: Colors.white,
           fontSize: 20,
         ),
+        iconTheme: const IconThemeData(
+          color: Color.fromARGB(213, 108, 238,
+              2), // Cambia el color del ícono de hamburguesa aquí
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -93,34 +97,56 @@ class _UserManagementPageState extends State<UserManagementPage> {
       ),
       drawer: Drawer(
         child: Container(
-          color: const Color.fromARGB(
-              255, 82, 100, 48), // Color verde para todo el Drawer
+          color: const Color.fromARGB(255, 218, 218, 218), // Color del Drawer
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
               DrawerHeader(
                 decoration: BoxDecoration(
                   color: const Color.fromARGB(
-                      255, 20, 42, 59), // Color más oscuro para el encabezado
+                      255, 20, 42, 59), // Color del encabezado
                 ),
-                child: Text(
-                  'Menú',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                  ),
+                child: Row(
+                  children: [
+                    // Logo con tamaño reducido
+                    Image.asset(
+                      'assets/img/logo2.png',
+                      width: 80, // Ruta del logo
+                      height: 40, //
+                      fit: BoxFit.contain, // Tamaño pequeño
+                      // Color del logo, si necesitas cambiar el color
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      'Dashboard',
+                      style: TextStyle(
+                        color: Colors.white, // Color del texto
+                        fontSize: 24,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               ListTile(
+                leading: Icon(Icons.person,
+                    color: const Color.fromARGB(
+                        255, 21, 128, 0)), // Icono con color blanco
                 title: Text('Gestión de Usuarios',
-                    style: TextStyle(color: Colors.white)),
+                    style: TextStyle(
+                        color: const Color.fromARGB(
+                            255, 20, 42, 59))), // Texto con color blanco
                 onTap: () {
                   Navigator.pop(context); // Cierra el menú
                 },
               ),
               ListTile(
+                leading: Icon(Icons.assignment,
+                    color: const Color.fromARGB(
+                        255, 21, 128, 0)), // Icono con color blanco
                 title: Text('Gestión de Comandas',
-                    style: TextStyle(color: Colors.white)),
+                    style: TextStyle(
+                        color: const Color.fromARGB(
+                            255, 20, 42, 59))), // Texto con color blanco
                 onTap: () {
                   Navigator.pop(context); // Cierra el menú
                   _navigateToOrderManagement();
