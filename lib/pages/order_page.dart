@@ -14,11 +14,8 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
   final List<Order> _orders = [];
   final _dateController = TextEditingController();
   final _timeController = TextEditingController();
-  final _quantityController = TextEditingController();
   final _totalPriceController = TextEditingController();
-  final _menuTypeController = TextEditingController();
-  final _userIdController = TextEditingController();
-  final _tableIdController = TextEditingController();
+  final _quantityController = TextEditingController();
 
   Order? _editingOrder;
 
@@ -93,7 +90,7 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
         _editingOrder = null;
       }
 
-      _clearFields();
+      // _clearFields();
     });
   }
 
@@ -103,8 +100,8 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
       _dateController.text = order.date;
       _timeController.text = order.time;
       _selectedQuantity = order.quantity.toString();
-      _totalPriceController.text =
-          (order.totalPrice / order.quantity).toString(); // Set price per item
+      _totalPriceController.text = (order.totalPrice / order.quantity)
+          .toStringAsFixed(2); // Set price per item
       _selectedMenuType = order.menuType;
       _selectedUserId = order.userId;
       _selectedTableId = order.tableId;
@@ -120,11 +117,8 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
   void _clearFields() {
     _dateController.clear();
     _timeController.clear();
-    _quantityController.clear();
     _totalPriceController.clear();
-    _menuTypeController.clear();
-    _userIdController.clear();
-    _tableIdController.clear();
+    _quantityController.clear();
     _selectedQuantity = null;
     _selectedMenuType = null;
     _selectedUserId = null;
@@ -293,7 +287,7 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
                   return ListTile(
                     title: Text('Fecha: ${order.date}, Hora: ${order.time}'),
                     subtitle: Text(
-                        'Cantidad: ${order.quantity}, Precio: \$${order.totalPrice}, Menú: ${order.menuType}, Usuario: ${order.userId}, Mesa: ${order.tableId}'),
+                        'Cantidad: ${order.quantity}, Precio: \$${order.totalPrice.toStringAsFixed(2)}, Menú: ${order.menuType}, Usuario: ${order.userId}, Mesa: ${order.tableId}'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

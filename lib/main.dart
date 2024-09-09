@@ -17,7 +17,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Cheftable',
-      home: UserManagementPage(), // Cambia esta línea para la página que desees como inicio
+      home:
+          UserManagementPage(), // Cambia esta línea para la página que desees como inicio
     );
   }
 }
