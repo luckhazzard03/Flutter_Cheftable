@@ -162,9 +162,10 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
   }
 
   void _logout() {
-    Navigator.pushReplacement(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false, // Elimina todas las pantallas anteriores
     );
   }
 

@@ -59,11 +59,10 @@ class _UserManagementPageState extends State<UserManagementPage> {
   }
 
   void _logout() {
-    // Aquí deberías agregar la lógica para cerrar sesión, por ejemplo, eliminando un token de autenticación.
-    // Luego redirige al usuario a la página de inicio de sesión.
-    Navigator.pushReplacement(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false, // Elimina todas las pantallas anteriores
     );
   }
 
