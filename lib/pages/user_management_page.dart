@@ -261,7 +261,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
             // Formulario para añadir o actualizar usuarios
@@ -278,7 +278,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
                     ),
                     validator: _validateName,
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 10),
                   TextFormField(
                     controller: _emailController,
                     decoration: const InputDecoration(
@@ -288,7 +288,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
                     keyboardType: TextInputType.emailAddress,
                     validator: _validateEmail,
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 10),
                   TextFormField(
                     controller: _phoneController,
                     decoration: const InputDecoration(
@@ -298,7 +298,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
                     keyboardType: TextInputType.number,
                     validator: _validatePhone,
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 10),
                   TextFormField(
                     controller: _passwordController,
                     obscureText: true, // Ocultar texto de la contraseña
@@ -308,7 +308,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
                     ),
                     validator: _validatePassword,
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 10),
                   DropdownButtonFormField<String>(
                     value: _selectedRole,
                     hint: const Text('Selecciona un rol'),
@@ -330,7 +330,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
                     validator: (value) =>
                         value == null ? 'Rol es requerido' : null,
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: _addUser,
                     style: ElevatedButton.styleFrom(

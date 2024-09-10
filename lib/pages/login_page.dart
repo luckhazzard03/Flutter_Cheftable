@@ -33,6 +33,44 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+
+//CONEXIÓN PARA EL API EN CODEIGNITER
+//en EL LoginPage, modificaR el método _login() para usar este nuevo método: Y APLICARLO EN USER Y ORDER
+//   void _login() async {
+//   String username = _usernameController.text;
+//   String password = _passwordController.text;
+
+//   if (username.isNotEmpty && password.isNotEmpty) {
+//     try {
+//       final result = await _authService.login(username, password);
+      
+//       // Guardar estado de autenticación
+//       final SharedPreferences prefs = await SharedPreferences.getInstance();
+//       await prefs.setBool('is_logged_in', true);
+
+//       // Puedes guardar más información del usuario si la API la devuelve
+//       // Por ejemplo: await prefs.setString('user_id', result['user_id']);
+
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(content: Text('Ingreso exitoso')),
+//       );
+
+//       Navigator.pushReplacement(
+//         context,
+//         MaterialPageRoute(builder: (context) => const UserManagementPage()),
+//       );
+//     } catch (e) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Error de inicio de sesión: ${e.toString()}')),
+//       );
+//     }
+//   } else {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       const SnackBar(content: Text('Por favor, ingresa usuario y contraseña')),
+//     );
+//   }
+// }
+
   void _login() async {
     String username = _usernameController.text;
     String password = _passwordController.text;
