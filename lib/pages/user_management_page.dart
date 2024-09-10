@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 import '../models/user.dart'; // Ajusta la ruta según tu estructura
 import 'login_page.dart'; // Importa la página de inicio de sesión
 import 'order_page.dart'; // Asegúrate de importar la página de gestión de comandas
@@ -12,42 +14,111 @@ class UserManagementPage extends StatefulWidget {
 
 class _UserManagementPageState extends State<UserManagementPage> {
   final List<User> _users = [];
+  final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
   String? _selectedRole;
   User? _editingUser;
 
-  void _addUser() {
-    final name = _nameController.text;
-    final email = _emailController.text;
-    final phone = _phoneController.text;
-    final role = _selectedRole ?? '';
-
-    if (name.isEmpty || email.isEmpty || phone.isEmpty || role.isEmpty) {
-      return;
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Nombre es requerido';
     }
+    return null;
+  }
 
-    setState(() {
-      if (_editingUser != null) {
-        final index = _users.indexOf(_editingUser!);
-        _users[index] =
-            User(name: name, email: email, phone: phone, role: role);
-        _editingUser = null;
-      } else {
-        _users.add(User(name: name, email: email, phone: phone, role: role));
-      }
-      _nameController.clear();
-      _emailController.clear();
-      _phoneController.clear();
-      _selectedRole = null;
-    });
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Correo electrónico es requerido';
+    }
+    final emailRegExp = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+    if (!emailRegExp.hasMatch(value)) {
+      return 'Debe ser un campo de correo electrónico válido';
+    }
+    return null;
+  }
+
+  String? _validatePhone(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Teléfono es requerido';
+    }
+    final phoneRegExp = RegExp(r'^\d{10}$');
+    if (!phoneRegExp.hasMatch(value)) {
+      return 'Teléfono debe contener exactamente 10 números';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Contraseña es requerida';
+    }
+    if (value.length < 6) {
+      return 'Contraseña debe tener al menos 6 caracteres'; // Cambié a 6 caracteres por tu error anterior
+    }
+    return null;
+  }
+
+  void _addUser() {
+    if (_formKey.currentState!.validate() && _selectedRole != null) {
+      final name = _nameController.text;
+      final email = _emailController.text;
+      final phone = _phoneController.text;
+      final password = _passwordController.text;
+      final role = _selectedRole!;
+
+      final hashedPassword = _hashPassword(password); // Hasheamos la contraseña
+
+      setState(() {
+        if (_editingUser != null) {
+          final index = _users.indexOf(_editingUser!);
+          _users[index] = User(
+            name: name,
+            email: email,
+            phone: phone,
+            role: role,
+            password: hashedPassword,
+          );
+          _editingUser = null;
+        } else {
+          _users.add(User(
+            name: name,
+            email: email,
+            phone: phone,
+            role: role,
+            password: hashedPassword,
+          ));
+        }
+        _nameController.clear();
+        _emailController.clear();
+        _phoneController.clear();
+        _passwordController.clear(); // Limpiar el campo de la contraseña
+        _selectedRole = null;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Completa todos los campos correctamente.'),
+        ),
+      );
+    }
+  }
+
+  String _hashPassword(String password) {
+    final bytes = utf8.encode(password); // Convertir la contraseña en bytes
+    final digest = sha256.convert(bytes); // Crear el hash
+    return digest.toString().substring(
+        0, 9); // Truncar el hash a 9 caracteres y lo convierte en string
   }
 
   void _editUser(User user) {
     _nameController.text = user.name;
     _emailController.text = user.email;
     _phoneController.text = user.phone;
+    _passwordController.text =
+        ''; // No mostramos la contraseña hasheada por seguridad
     _selectedRole = user.role;
     setState(() {
       _editingUser = user;
@@ -179,52 +250,102 @@ class _UserManagementPageState extends State<UserManagementPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Nombre'),
-            ),
-            TextField(
-              controller: _emailController,
-              decoration:
-                  const InputDecoration(labelText: 'Correo electrónico'),
-            ),
-            TextField(
-              controller: _phoneController,
-              decoration: const InputDecoration(labelText: 'Teléfono'),
-            ),
-            DropdownButton<String>(
-              value: _selectedRole,
-              hint: const Text('Selecciona un rol'),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedRole = newValue;
-                });
-              },
-              items: <String>['Admin', 'Chef', 'Mesero']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _addUser,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(214, 99, 219, 0),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                ),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 40.0, vertical: 12.0),
+            // Formulario para añadir o actualizar usuarios
+            Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Nombre',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: _validateName,
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(
+                      labelText: 'Correo electrónico',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: _validateEmail,
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: _phoneController,
+                    decoration: const InputDecoration(
+                      labelText: 'Teléfono',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: _validatePhone,
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true, // Ocultar texto de la contraseña
+                    decoration: const InputDecoration(
+                      labelText: 'Contraseña',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: _validatePassword,
+                  ),
+                  SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: _selectedRole,
+                    hint: const Text('Selecciona un rol'),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedRole = newValue;
+                      });
+                    },
+                    items: <String>['Admin', 'Chef', 'Mesero']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) =>
+                        value == null ? 'Rol es requerido' : null,
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _addUser,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(214, 99, 219, 0),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 16.0),
+                    ),
+                    child: Text(_editingUser != null
+                        ? 'Actualizar Usuario'
+                        : 'Añadir Usuario'),
+                  ),
+                ],
               ),
-              child: Text(_editingUser != null
-                  ? 'Actualizar Usuario'
-                  : 'Añadir Usuario'),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 24),
+            Text(
+              'Usuarios',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            SizedBox(height: 8),
+            Container(
+              color: const Color.fromARGB(255, 0, 177, 38),
+              height: 2,
+            ),
+            SizedBox(height: 16),
             Expanded(
               child: ListView.builder(
                 itemCount: _users.length,
@@ -232,16 +353,21 @@ class _UserManagementPageState extends State<UserManagementPage> {
                   final user = _users[index];
                   return ListTile(
                     title: Text(user.name),
-                    subtitle: Text('${user.email} - ${user.role}'),
+                    subtitle: Text(
+                        '${user.email} - ${user.role} - Contraseña: ${user.password}'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
                           icon: const Icon(Icons.edit),
+                          color: Colors
+                              .green, // Color verde para el icono de editar
                           onPressed: () => _editUser(user),
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete),
+                          color: Colors
+                              .green, // Color verde para el icono de eliminar
                           onPressed: () => _deleteUser(user),
                         ),
                       ],
