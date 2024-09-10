@@ -354,7 +354,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
                   return ListTile(
                     title: Text(user.name),
                     subtitle: Text(
-                        '${user.email} - ${user.role} - Contraseña: ${user.password}'),
+                        'Correo: ${user.email} \nRol: ${user.role}\nCel: ${user.phone}\nContraseña: ${user.password}'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
