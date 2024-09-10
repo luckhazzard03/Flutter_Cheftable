@@ -15,6 +15,7 @@ dependencies:
   intl: ^0.18.0 # Asegúrate de usar la última versión disponible
   cupertino_icons: ^1.0.6
   http: any
+  shared_preferences: ^2.0.13
 dev_dependencies:
   flutter_test:
     sdk: flutter

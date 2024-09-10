@@ -3,7 +3,8 @@ import 'package:crypto/crypto.dart';
 import 'dart:convert';
 import '../models/user.dart'; // Ajusta la ruta según tu estructura
 import 'login_page.dart'; // Importa la página de inicio de sesión
-import 'order_page.dart'; // Asegúrate de importar la página de gestión de comandas
+import 'order_page.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Asegúrate de importar la página de gestión de comandas
 
 class UserManagementPage extends StatefulWidget {
   const UserManagementPage({super.key});
@@ -82,6 +83,11 @@ class _UserManagementPageState extends State<UserManagementPage> {
             password: hashedPassword,
           );
           _editingUser = null;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Usuario actualizado.'),
+            ),
+          );
         } else {
           _users.add(User(
             name: name,
@@ -90,6 +96,11 @@ class _UserManagementPageState extends State<UserManagementPage> {
             role: role,
             password: hashedPassword,
           ));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Usuario creado.'),
+            ),
+          );
         }
         _nameController.clear();
         _emailController.clear();
@@ -131,7 +142,10 @@ class _UserManagementPageState extends State<UserManagementPage> {
     });
   }
 
-  void _logout() {
+  void _logout() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('is_logged_in'); // Elimina el estado de la sesión
+
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -351,26 +365,30 @@ class _UserManagementPageState extends State<UserManagementPage> {
                 itemCount: _users.length,
                 itemBuilder: (context, index) {
                   final user = _users[index];
-                  return ListTile(
-                    title: Text(user.name),
-                    subtitle: Text(
-                        'Correo: ${user.email} \nRol: ${user.role}\nCel: ${user.phone}\nContraseña: ${user.password}'),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          color: Colors
-                              .green, // Color verde para el icono de editar
-                          onPressed: () => _editUser(user),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete),
-                          color: Colors
-                              .green, // Color verde para el icono de eliminar
-                          onPressed: () => _deleteUser(user),
-                        ),
-                      ],
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    elevation: 5,
+                    child: ListTile(
+                      title: Text(user.name),
+                      subtitle: Text(
+                          'Correo: ${user.email} \nRol: ${user.role}\nCel: ${user.phone}\nContraseña: ${user.password}'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            color: Colors
+                                .green, // Color verde para el icono de editar
+                            onPressed: () => _editUser(user),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            color: Colors
+                                .green, // Color verde para el icono de eliminar
+                            onPressed: () => _deleteUser(user),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },

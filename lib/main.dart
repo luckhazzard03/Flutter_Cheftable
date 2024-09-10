@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_5/services/auth_service.dart'; // Ajusta el import según tu estructura
-import 'pages/user_management_page.dart'; // Importa tu página de gestión de usuarios
+// Importa tu página de gestión de usuarios
+import 'pages/login_page.dart'; // Importa tu página de gestión de usuarios
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Cheftable',
       home:
-          UserManagementPage(), // Cambia esta línea para la página que desees como inicio
+          LoginPage(), // Cambia esta línea para la página que desees como inicio
     );
   }
 }
