@@ -22,6 +22,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
   final _passwordController = TextEditingController();
   String? _selectedRole;
   User? _editingUser;
+  bool _isFormVisible = false; // Controla la visibilidad del formulario
 
   String? _validateName(String? value) {
     if (value == null || value.isEmpty) {
@@ -57,7 +58,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
       return 'Contraseña es requerida';
     }
     if (value.length < 6) {
-      return 'Contraseña debe tener al menos 6 caracteres'; // Cambié a 6 caracteres por tu error anterior
+      return 'Contraseña debe tener al menos 6 caracteres';
     }
     return null;
   }
@@ -70,7 +71,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
       final password = _passwordController.text;
       final role = _selectedRole!;
 
-      final hashedPassword = _hashPassword(password); // Hasheamos la contraseña
+      final hashedPassword = _hashPassword(password);
 
       setState(() {
         if (_editingUser != null) {
@@ -105,7 +106,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
         _nameController.clear();
         _emailController.clear();
         _phoneController.clear();
-        _passwordController.clear(); // Limpiar el campo de la contraseña
+        _passwordController.clear();
         _selectedRole = null;
       });
     } else {
@@ -118,18 +119,16 @@ class _UserManagementPageState extends State<UserManagementPage> {
   }
 
   String _hashPassword(String password) {
-    final bytes = utf8.encode(password); // Convertir la contraseña en bytes
-    final digest = sha256.convert(bytes); // Crear el hash
-    return digest.toString().substring(
-        0, 9); // Truncar el hash a 9 caracteres y lo convierte en string
+    final bytes = utf8.encode(password);
+    final digest = sha256.convert(bytes);
+    return digest.toString().substring(0, 9);
   }
 
   void _editUser(User user) {
     _nameController.text = user.name;
     _emailController.text = user.email;
     _phoneController.text = user.phone;
-    _passwordController.text =
-        ''; // No mostramos la contraseña hasheada por seguridad
+    _passwordController.text = '';
     _selectedRole = user.role;
     setState(() {
       _editingUser = user;
@@ -144,12 +143,12 @@ class _UserManagementPageState extends State<UserManagementPage> {
 
   void _logout() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('is_logged_in'); // Elimina el estado de la sesión
+    await prefs.remove('is_logged_in');
 
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),
-      (route) => false, // Elimina todas las pantallas anteriores
+      (route) => false,
     );
   }
 
@@ -260,142 +259,167 @@ class _UserManagementPageState extends State<UserManagementPage> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          children: [
-            // Formulario para añadir o actualizar usuarios
-            Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nombre',
-                      border: OutlineInputBorder(),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              children: [
+                // Mostrar el formulario solo si _isFormVisible es true
+                if (_isFormVisible)
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        TextFormField(
+                          controller: _nameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Nombre',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: _validateName,
+                        ),
+                        SizedBox(height: 10),
+                        TextFormField(
+                          controller: _emailController,
+                          decoration: const InputDecoration(
+                            labelText: 'Correo electrónico',
+                            border: OutlineInputBorder(),
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          validator: _validateEmail,
+                        ),
+                        SizedBox(height: 10),
+                        TextFormField(
+                          controller: _phoneController,
+                          decoration: const InputDecoration(
+                            labelText: 'Teléfono',
+                            border: OutlineInputBorder(),
+                          ),
+                          keyboardType: TextInputType.number,
+                          validator: _validatePhone,
+                        ),
+                        SizedBox(height: 10),
+                        TextFormField(
+                          controller: _passwordController,
+                          obscureText: true,
+                          decoration: const InputDecoration(
+                            labelText: 'Contraseña',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: _validatePassword,
+                        ),
+                        SizedBox(height: 10),
+                        DropdownButtonFormField<String>(
+                          value: _selectedRole,
+                          hint: const Text('Selecciona un rol'),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _selectedRole = newValue;
+                            });
+                          },
+                          items: <String>['Admin', 'Chef', 'Mesero']
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) =>
+                              value == null ? 'Rol es requerido' : null,
+                        ),
+                        SizedBox(height: 10),
+                        ElevatedButton(
+                          onPressed: _addUser,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color.fromARGB(214, 99, 219, 0),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20.0, vertical: 16.0),
+                          ),
+                          child: Text(_editingUser != null
+                              ? 'Actualizar Usuario'
+                              : 'Añadir Usuario'),
+                        ),
+                      ],
                     ),
-                    validator: _validateName,
                   ),
-                  SizedBox(height: 10),
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Correo electrónico',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: _validateEmail,
-                  ),
-                  SizedBox(height: 10),
-                  TextFormField(
-                    controller: _phoneController,
-                    decoration: const InputDecoration(
-                      labelText: 'Teléfono',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: _validatePhone,
-                  ),
-                  SizedBox(height: 10),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: true, // Ocultar texto de la contraseña
-                    decoration: const InputDecoration(
-                      labelText: 'Contraseña',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: _validatePassword,
-                  ),
-                  SizedBox(height: 10),
-                  DropdownButtonFormField<String>(
-                    value: _selectedRole,
-                    hint: const Text('Selecciona un rol'),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedRole = newValue;
-                      });
-                    },
-                    items: <String>['Admin', 'Chef', 'Mesero']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
+                SizedBox(height: 24),
+                Text(
+                  'Usuarios',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                SizedBox(height: 8),
+                Container(
+                  color: const Color.fromARGB(255, 0, 177, 38),
+                  height: 2,
+                ),
+                SizedBox(height: 16),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _users.length,
+                    itemBuilder: (context, index) {
+                      final user = _users[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8.0),
+                        elevation: 5,
+                        child: ListTile(
+                          title: Text(user.name),
+                          subtitle: Text(
+                              'Correo: ${user.email} \nRol: ${user.role}\nCel: ${user.phone}\nContraseña: ${user.password}'),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                color: Colors.green,
+                                onPressed: () => _editUser(user),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                color: Colors.green,
+                                onPressed: () => _deleteUser(user),
+                              ),
+                            ],
+                          ),
+                        ),
                       );
-                    }).toList(),
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) =>
-                        value == null ? 'Rol es requerido' : null,
+                    },
                   ),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: _addUser,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(214, 99, 219, 0),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 16.0),
-                    ),
-                    child: Text(_editingUser != null
-                        ? 'Actualizar Usuario'
-                        : 'Añadir Usuario'),
-                  ),
-                ],
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 80.0, // Margen inferior
+            right: 30.0, // Margen derecho
+            child: ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _isFormVisible = !_isFormVisible; // Alternar visibilidad
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(214, 99, 219, 0),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50.0),
+                ),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0, vertical: 16.0),
               ),
+              child: Text(_isFormVisible ? 'Ocultar Formulario' : 'ADD'),
             ),
-            SizedBox(height: 24),
-            Text(
-              'Usuarios',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            SizedBox(height: 8),
-            Container(
-              color: const Color.fromARGB(255, 0, 177, 38),
-              height: 2,
-            ),
-            SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: _users.length,
-                itemBuilder: (context, index) {
-                  final user = _users[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    elevation: 5,
-                    child: ListTile(
-                      title: Text(user.name),
-                      subtitle: Text(
-                          'Correo: ${user.email} \nRol: ${user.role}\nCel: ${user.phone}\nContraseña: ${user.password}'),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            color: Colors
-                                .green, // Color verde para el icono de editar
-                            onPressed: () => _editUser(user),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            color: Colors
-                                .green, // Color verde para el icono de eliminar
-                            onPressed: () => _deleteUser(user),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -20,6 +20,7 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
   final _quantityController = TextEditingController();
 
   Order? _editingOrder;
+  bool _isFormVisible = false; // Controla la visibilidad del formulario
 
   final List<String> _menuTypes = ['Corriente', 'Ejecutivo', 'Especial'];
   final List<String> _tableIds =
@@ -102,7 +103,7 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
         _editingOrder = null;
       }
 
-      //_clearFields();
+      _clearFields();
     });
   }
 
@@ -254,7 +255,7 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => UserManagementPage()),
+                            builder: (context) => const UserManagementPage()),
                       );
                     },
                   ),
@@ -279,118 +280,199 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: _dateController,
-              decoration: const InputDecoration(
-                labelText: 'Fecha',
-                border: OutlineInputBorder(),
-              ),
-              onTap: () => _selectDate(context),
-              readOnly: true,
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Mostrar el formulario solo si _isFormVisible es true
+                if (_isFormVisible)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextField(
+                        controller: _dateController,
+                        decoration: const InputDecoration(
+                          labelText: 'Fecha',
+                          border: OutlineInputBorder(),
+                        ),
+                        onTap: () => _selectDate(context),
+                        readOnly: true,
+                      ),
+                      SizedBox(height: 10),
+                      TextField(
+                        controller: _timeController,
+                        decoration: const InputDecoration(
+                          labelText: 'Hora',
+                          border: OutlineInputBorder(),
+                        ),
+                        onTap: () => _selectTime(context),
+                        readOnly: true,
+                      ),
+                      SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        value: _selectedQuantity,
+                        items: _quantities.map((quantity) {
+                          return DropdownMenuItem<String>(
+                            value: quantity,
+                            child: Text(quantity),
+                          );
+                        }).toList(),
+                        decoration: const InputDecoration(
+                          labelText: 'Cantidad de platos',
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedQuantity = value;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        value: _selectedMenuType,
+                        items: _menuTypes.map((menuType) {
+                          return DropdownMenuItem<String>(
+                            value: menuType,
+                            child: Text(menuType),
+                          );
+                        }).toList(),
+                        decoration: const InputDecoration(
+                          labelText: 'Tipo de menú',
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedMenuType = value;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        value: _selectedTableId,
+                        items: _tableIds.map((tableId) {
+                          return DropdownMenuItem<String>(
+                            value: tableId,
+                            child: Text(tableId),
+                          );
+                        }).toList(),
+                        decoration: const InputDecoration(
+                          labelText: 'ID Mesa',
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedTableId = value;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        value: _selectedUserId,
+                        items: _userIds.map((userId) {
+                          return DropdownMenuItem<String>(
+                            value: userId,
+                            child: Text(userId),
+                          );
+                        }).toList(),
+                        decoration: const InputDecoration(
+                          labelText: 'ID Usuario',
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedUserId = value;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 10),
+                      TextField(
+                        controller: _totalPriceController,
+                        keyboardType:
+                            TextInputType.numberWithOptions(decimal: true),
+                        decoration: const InputDecoration(
+                          labelText: 'Precio unitario',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _addOrder,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color.fromARGB(214, 99, 219, 0),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 40.0, vertical: 12.0),
+                        ),
+                        child: Text(_editingOrder == null
+                            ? 'Añadir Comanda'
+                            : 'Actualizar Comanda'),
+                      ),
+                      SizedBox(height: 24),
+                    ],
+                  ),
+                // Título y línea verde
+                Text(
+                  'Comandas Creadas',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Container(
+                  height: 2,
+                  color: Colors.green,
+                  margin: const EdgeInsets.symmetric(vertical: 8.0),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _orders.length,
+                    itemBuilder: (context, index) {
+                      final order = _orders[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8.0),
+                        elevation: 5,
+                        child: ListTile(
+                          title: Text(
+                              'COMANDA ${index + 1}: \nFecha: ${order.date}, Hora: ${order.time}'),
+                          subtitle: Text(
+                              'Cantidad: ${order.quantity}, \nPrecio: \$${order.totalPrice.toStringAsFixed(2)}, \nMenú: ${order.menuType}, \nUsuario: ${order.userId}, \nMesa: ${order.tableId}'),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit, color: Colors.green),
+                                onPressed: () => _editOrder(order),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete, color: Colors.green),
+                                onPressed: () => _deleteOrder(order),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 16),
-            TextField(
-              controller: _timeController,
-              decoration: const InputDecoration(
-                labelText: 'Hora',
-                border: OutlineInputBorder(),
-              ),
-              onTap: () => _selectTime(context),
-              readOnly: true,
-            ),
-            SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _selectedQuantity,
-              items: _quantities.map((quantity) {
-                return DropdownMenuItem<String>(
-                  value: quantity,
-                  child: Text(quantity),
-                );
-              }).toList(),
-              decoration: const InputDecoration(
-                labelText: 'Cantidad de platos',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
+          ),
+          Positioned(
+            bottom: 45.0, // Margen inferior
+            right: 25.0, // Margen derecho
+            child: ElevatedButton(
+              onPressed: () {
                 setState(() {
-                  _selectedQuantity = value;
+                  _isFormVisible = !_isFormVisible; // Alternar visibilidad
                 });
               },
-            ),
-            SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _selectedMenuType,
-              items: _menuTypes.map((menuType) {
-                return DropdownMenuItem<String>(
-                  value: menuType,
-                  child: Text(menuType),
-                );
-              }).toList(),
-              decoration: const InputDecoration(
-                labelText: 'Tipo de menú',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _selectedMenuType = value;
-                });
-              },
-            ),
-            SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _selectedTableId,
-              items: _tableIds.map((tableId) {
-                return DropdownMenuItem<String>(
-                  value: tableId,
-                  child: Text(tableId),
-                );
-              }).toList(),
-              decoration: const InputDecoration(
-                labelText: 'ID Mesa',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _selectedTableId = value;
-                });
-              },
-            ),
-            SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _selectedUserId,
-              items: _userIds.map((userId) {
-                return DropdownMenuItem<String>(
-                  value: userId,
-                  child: Text(userId),
-                );
-              }).toList(),
-              decoration: const InputDecoration(
-                labelText: 'ID Usuario',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _selectedUserId = value;
-                });
-              },
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: _totalPriceController,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: 'Precio unitario',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _addOrder,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(214, 99, 219, 0),
                 foregroundColor: Colors.white,
@@ -398,59 +480,12 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
                   borderRadius: BorderRadius.circular(30.0),
                 ),
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 40.0, vertical: 12.0),
+                    horizontal: 20.0, vertical: 16.0),
               ),
-              child: Text(_editingOrder == null
-                  ? 'Añadir Comanda'
-                  : 'Actualizar Comanda'),
+              child: Text(_isFormVisible ? 'Ocultar Formulario' : 'ADD'),
             ),
-            SizedBox(height: 24),
-            // Título y línea verde
-            Text(
-              'Comandas Creadas',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Container(
-              height: 2,
-              color: Colors.green,
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: _orders.length,
-                itemBuilder: (context, index) {
-                  final order = _orders[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    elevation: 5,
-                    child: ListTile(
-                      title: Text(
-                          'COMANDA ${index + 1}: \nFecha: ${order.date}, Hora: ${order.time}'),
-                      subtitle: Text(
-                          'Cantidad: ${order.quantity}, \nPrecio: \$${order.totalPrice.toStringAsFixed(2)}, \nMenú: ${order.menuType}, \nUsuario: ${order.userId}, \nMesa: ${order.tableId}'),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.edit, color: Colors.green),
-                            onPressed: () => _editOrder(order),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.delete, color: Colors.green),
-                            onPressed: () => _deleteOrder(order),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
