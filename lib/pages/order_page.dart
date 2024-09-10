@@ -103,7 +103,7 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
         _editingOrder = null;
       }
 
-      _clearFields();
+      //_clearFields();
     });
   }
 
