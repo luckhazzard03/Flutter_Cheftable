@@ -69,13 +69,21 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
     setState(() {
       if (_editingOrder == null) {
         _orders.add(Order(
-          date: date,
-          time: time,
-          quantity: quantity,
-          totalPrice: totalPrice,
-          menuType: menuType,
-          userId: userId,
-          tableId: tableId,
+          id: 0, // Puedes usar un valor predeterminado o generar un ID si es necesario
+          fecha: date,
+          hora: time,
+          totalPlatos:
+              quantity, // Asegúrate de que 'quantity' esté mapeado a 'totalPlatos'
+          precioTotal:
+              totalPrice, // Asegúrate de que 'totalPrice' esté mapeado a 'precioTotal'
+          tipoMenu:
+              menuType, // Asegúrate de que 'menuType' esté mapeado a 'tipoMenu'
+          idUsuarioFk: int.parse(
+              userId), // Asegúrate de que 'userId' esté mapeado a 'idUsuarioFk'
+          idMesaFk: int.parse(
+              tableId), // Asegúrate de que 'tableId' esté mapeado a 'idMesaFk'
+          createAt: '', // Puedes asignar un valor predeterminado o calcularlo
+          updateAt: '', // Puedes asignar un valor predeterminado o calcularlo
         ));
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -85,14 +93,18 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
       } else {
         final index = _orders.indexOf(_editingOrder!);
         if (index != -1) {
-          _orders[index] = Order(
-            date: date,
-            time: time,
-            quantity: quantity,
-            totalPrice: totalPrice,
-            menuType: menuType,
-            userId: userId,
-            tableId: tableId,
+          // Si _editingOrder no es null, actualiza la orden existente
+          _orders[_orders.indexOf(_editingOrder!)] = Order(
+            id: _editingOrder!.id,
+            fecha: date,
+            hora: time,
+            totalPlatos: quantity,
+            precioTotal: totalPrice,
+            tipoMenu: menuType,
+            idUsuarioFk: int.parse(userId),
+            idMesaFk: int.parse(tableId),
+            createAt: _editingOrder!.createAt,
+            updateAt: _editingOrder!.updateAt,
           );
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -110,14 +122,27 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
   void _editOrder(Order order) {
     setState(() {
       _editingOrder = order;
-      _dateController.text = order.date;
-      _timeController.text = order.time;
-      _selectedQuantity = order.quantity.toString();
-      _totalPriceController.text = (order.totalPrice / order.quantity)
-          .toStringAsFixed(2); // Set price per item
-      _selectedMenuType = order.menuType;
-      _selectedUserId = order.userId;
-      _selectedTableId = order.tableId;
+
+      // Asignar valores a los controladores y variables de estado
+      _dateController.text = order.fecha; // Cambio de 'date' a 'fecha'
+      _timeController.text = order.hora; // Cambio de 'time' a 'hora'
+      _selectedQuantity =
+          order.totalPlatos.toString(); // Cambio de 'quantity' a 'totalPlatos'
+
+      // Calcula el precio por ítem y establece el texto en el controlador
+      if (order.totalPlatos != 0) {
+        _totalPriceController.text = (order.precioTotal / order.totalPlatos)
+            .toStringAsFixed(2); // Cambio de 'totalPrice' a 'precioTotal'
+      } else {
+        _totalPriceController.text =
+            '0.00'; // Maneja el caso en que 'totalPlatos' sea 0
+      }
+
+      _selectedMenuType = order.tipoMenu; // Cambio de 'menuType' a 'tipoMenu'
+      _selectedUserId =
+          order.idUsuarioFk.toString(); // Cambio de 'userId' a 'idUsuarioFk'
+      _selectedTableId =
+          order.idMesaFk.toString(); // Cambio de 'tableId' a 'idMesaFk'
     });
   }
 
@@ -440,9 +465,9 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
                         elevation: 5,
                         child: ListTile(
                           title: Text(
-                              'COMANDA ${index + 1}: \nFecha: ${order.date}, Hora: ${order.time}'),
+                              'COMANDA ${index + 1}: \nFecha: ${order.fecha}, Hora: ${order.hora}'),
                           subtitle: Text(
-                              'Cantidad: ${order.quantity}, \nPrecio: \$${order.totalPrice.toStringAsFixed(2)}, \nMenú: ${order.menuType}, \nUsuario: ${order.userId}, \nMesa: ${order.tableId}'),
+                              'Cantidad: ${order.totalPlatos}, \nPrecio: \$${order.precioTotal.toStringAsFixed(2)}, \nMenú: ${order.tipoMenu}, \nUsuario: ${order.idUsuarioFk}, \nMesa: ${order.idMesaFk}'),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [

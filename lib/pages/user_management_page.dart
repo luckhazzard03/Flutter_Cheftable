@@ -71,17 +71,25 @@ class _UserManagementPageState extends State<UserManagementPage> {
       final password = _passwordController.text;
       final role = _selectedRole!;
 
+      // Hash de contraseña (asegúrate de implementar un método seguro para esto)
       final hashedPassword = _hashPassword(password);
 
       setState(() {
         if (_editingUser != null) {
+          // Editar usuario existente
           final index = _users.indexOf(_editingUser!);
           _users[index] = User(
-            name: name,
+            idUsuario: _editingUser!
+                .idUsuario, // Mantener el ID existente para la edición
+            nombre: name,
             email: email,
-            phone: phone,
-            role: role,
             password: hashedPassword,
+            telefono: phone,
+            idRolesFk: int.parse(
+                role), // Asumiendo que role es un int, si es String ajusta según corresponda
+            createdAt: _editingUser!
+                .createdAt, // Mantener las fechas de creación y actualización
+            updatedAt: DateTime.now(), // Actualizar la fecha de modificación
           );
           _editingUser = null;
           ScaffoldMessenger.of(context).showSnackBar(
@@ -90,12 +98,16 @@ class _UserManagementPageState extends State<UserManagementPage> {
             ),
           );
         } else {
+          // Agregar nuevo usuario
           _users.add(User(
-            name: name,
+            idUsuario: 0, // El ID se asignará en la base de datos
+            nombre: name,
             email: email,
-            phone: phone,
-            role: role,
             password: hashedPassword,
+            telefono: phone,
+            idRolesFk: int.parse(role),
+            createdAt: DateTime.now(), // Fecha de creación
+            updatedAt: DateTime.now(), // Fecha de modificación
           ));
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -103,6 +115,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
             ),
           );
         }
+        // Limpiar campos del formulario
         _nameController.clear();
         _emailController.clear();
         _phoneController.clear();
@@ -110,6 +123,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
         _selectedRole = null;
       });
     } else {
+      // Mostrar mensaje de error si los campos no están completos
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Completa todos los campos correctamente.'),
@@ -125,11 +139,13 @@ class _UserManagementPageState extends State<UserManagementPage> {
   }
 
   void _editUser(User user) {
-    _nameController.text = user.name;
+    _nameController.text = user.nombre;
     _emailController.text = user.email;
-    _phoneController.text = user.phone;
-    _passwordController.text = '';
-    _selectedRole = user.role;
+    _phoneController.text = user.telefono;
+    _passwordController.text =
+        ''; // Mantener la contraseña en blanco para evitar mostrarla
+    _selectedRole = user.idRolesFk
+        .toString(); // Asegúrate de que _selectedRole sea compatible con idRolesFk
     setState(() {
       _editingUser = user;
     });
@@ -372,9 +388,9 @@ class _UserManagementPageState extends State<UserManagementPage> {
                         margin: const EdgeInsets.symmetric(vertical: 8.0),
                         elevation: 5,
                         child: ListTile(
-                          title: Text(user.name),
+                          title: Text(user.nombre),
                           subtitle: Text(
-                              'Correo: ${user.email} \nRol: ${user.role}\nCel: ${user.phone}\nContraseña: ${user.password}'),
+                              'Correo: ${user.email} \nRol: ${user.idRolesFk}\nCel: ${user.telefono}\nContraseña: ${user.password}'),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [

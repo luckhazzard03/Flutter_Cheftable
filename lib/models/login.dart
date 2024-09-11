@@ -1,39 +1,36 @@
-// lib/models/user.dart
-
-// Necesario para formatear fechas si es necesario
-
-class User {
+// lib/models/login.dart
+class Login {
   final int idUsuario;
   final String nombre;
   final String password;
   final String email;
   final String telefono;
   final int idRolesFk;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime createAt;
+  final DateTime updateAt;
 
-  User({
+  Login({
     required this.idUsuario,
     required this.nombre,
     required this.password,
     required this.email,
     required this.telefono,
     required this.idRolesFk,
-    required this.createdAt,
-    required this.updatedAt,
+    required this.createAt,
+    required this.updateAt,
   });
 
   // Factory constructor to create an instance from a JSON map
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory Login.fromJson(Map<String, dynamic> json) {
+    return Login(
       idUsuario: json['idUsuario'],
       nombre: json['Nombre'],
       password: json['Password'],
       email: json['Email'],
       telefono: json['Telefono'],
       idRolesFk: json['idRoles_fk'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      createAt: DateTime.parse(json['create_at']),
+      updateAt: DateTime.parse(json['update_at']),
     );
   }
 
@@ -46,8 +43,8 @@ class User {
       'Email': email,
       'Telefono': telefono,
       'idRoles_fk': idRolesFk,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
+      'create_at': createAt.toIso8601String(),
+      'update_at': updateAt.toIso8601String(),
     };
   }
 }
